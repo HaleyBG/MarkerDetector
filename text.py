@@ -393,13 +393,6 @@ def find_fid_marker(img_ori: np.ndarray, template: np.ndarray, dense: int):
     fid = new_fid
     # fid元素解释： fid=(x,y,ncc,avg_pixel,ncc*avg_pixel,index)
 
-    # 当高斯筛选流程去除之后，需要加以下步骤完成数据转换
-    # candidate = np.array(candidate)
-    # fid = np.zeros((len(candidate), 6), dtype=int)
-    # fid[:,:2] = candidate[:,:2]
-    # fid[:,5] = candidate[:,2]
-    # fid = fid.tolist()
-
     # 判断是否要对高斯筛选结果进一步筛选,判断变量为temp，若temp，则加两个筛选过程，否则不额外筛选。
     new_fid = []# new_fid没啥用,可以删除
     temp = distribute_again(fid)  #,new_fid)  # temp为是否运行refine_fid_by_contrast的指标
@@ -408,12 +401,6 @@ def find_fid_marker(img_ori: np.ndarray, template: np.ndarray, dense: int):
         contrast_list_show=[]
         refine_fid_by_contrast(img, fid, new_fid, contrast_list_show)
         fid = new_fid
-
-    # step2若没有判断条件的代码
-    # new_fid = []
-    # contrast_list_show = []
-    # refine_fid_by_contrast(img, fid, new_fid, contrast_list_show)
-    # fid = new_fid
 
     # 作图保存数据
     img_paint = fun.Img_in2(img)
@@ -571,13 +558,7 @@ def score_pixel(img:np.ndarray, location_xy:np.ndarray):
 
 
 if __name__ == '__main__':
-    # file_path = input('Please enter the path of images used to detect.')
-    # result_folder = input('Please entry the path to save result of file.')
     file_path = './mrccut/small/deep3/'
-    # file_path = './mrccut/text/'
-    # file_path = './mrccut/small/deep4/'
-    # file_path = './mrccut/big/deep4/'
-    # file_path = './mrccut/resize_data/'
     file_name = bs.readname(file_path)
     result_folder = f"./result_{time.strftime('%m-%d-%H-%M-%S',time.localtime(time.time()))}"
     bs.mkdir(result_folder)
