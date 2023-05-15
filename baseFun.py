@@ -6,6 +6,38 @@ import fundmental
 import math
 
 
+class PointSet(object):
+    def __init__(self, point_set: np.ndarray):
+        self.set = point_set
+
+    def fund_point_in_set(self, point: np.ndarray):
+        """
+        寻找set中距离point最近的点
+        :param point: 需要寻找的点
+        :return:
+        """
+        min_dist = 1000
+        min_point = [0, 0]
+        for i in range(len(self.set)):
+            temp_dist = math.sqrt((point[0] - self.set[i][0]) ** 2 + (point[1] - self.set[i][1]) ** 2)
+            if temp_dist < min_dist:
+                min_dist = temp_dist
+                min_point = self.set[i]
+        return min_dist, min_point
+
+class Rect(object):
+    def __init__(self, x:int, y:int, width:int, height:int):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+
+class Point(object):
+    def __init__(self, x:int=0, y:int=0):
+        self.x = x
+        self.y = y
+
+
 def img_hist(img: np.ndarray):
     """
     used to generate a histogram
@@ -56,10 +88,24 @@ def ncc_value(img1, img2):
 
 
 def normalize(img: np.ndarray):
-    max_img = img.max()
-    min_img = img.min()
-    img_norm = ((img - min_img) / (max_img - min_img)).astype(np.float32)
-    return img_norm
+    '''
+    图像归一化函数
+    :param img: 输入图像
+    :return:
+    image:归一化后图像
+    Max:归一化前图像的最大值
+    Min:归一化前图像的最小值
+    '''
+    Max = img.max()
+    Min = img.min()
+    mean, std = cv2.meanStdDev(img)
+    Max = Max if mean + 3 * std > Max else mean + 3 * std
+    Min = Min if mean - 3 * std < Min else mean - 3 * std
+    image = (img - img.min()) / (img.max() - img.min())
+    image[image > 1] == 1
+    image[image < 0] == 0
+    image = image.astype(np.float32)
+    return image
 
 
 def dis_p(point1, point2):
@@ -80,15 +126,15 @@ def roundness(label_img):
     :return:
     """
     contours, hierarchy = cv2.findContours(np.array(label_img, dtype=np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    a = cv2.contourArea(contours[0])*4*math.pi
-    b = math.pow(cv2.arcLength(contours[0],True), 2)
+    a = cv2.contourArea(contours[0]) * 4 * math.pi
+    b = math.pow(cv2.arcLength(contours[0], True), 2)
     if b == 0:
         return 0
-    return a/b
+    return a / b
 
 
 def find_local_peak(img, m, n, m_w, n_w):
-    sub_img= img[m:m + m_w, n:n + n_w]
+    sub_img = img[m:m + m_w, n:n + n_w]
     min_val, max_val, min_l, max_l = cv2.minMaxLoc(sub_img)
     peak_m = m + max_l[1]
     peak_n = n + max_l[0]
@@ -102,6 +148,24 @@ def mkdir(path):
         print(f"---new foler {path} ---")
     else:
         print(f"---There is this folder!---")
+
+
+def fund_point_in_set(point: np.ndarray, point_set: np.ndarray):
+    """
+    寻找set中距离point最近的点
+    :param point: 需要寻找的点
+    :param point_set: 寻找的点集
+    :return:
+    """
+    min_dist = 1000
+    min_point = [0, 0]
+    for i in range(len(point_set)):
+        temp_dist = math.sqrt((point[0] - point_set[i][0]) ** 2 + (point[1] - point_set[i][1]) ** 2)
+        if temp_dist < min_dist:
+            min_dist = temp_dist
+            min_point = point_set[i]
+    return
+
 
 if __name__ == '__main__':
     # ori_img = cv2.imread('10111_19.jpg', 0)

@@ -22,35 +22,35 @@ def compute_distance(location):
         for j in range(i+1, n):
             distance[i, j]=np.sqrt(sum(np.power(location[i]-location[j], 2)))
     return distance
-# def hiClustering(location):
+# def hiClustering(locations):
 #     '''
 #     关于坐标的层次聚类算法
-#     :param location: 需要进行聚类分析的坐标集合，size = n*2
+#     :param locations: 需要进行聚类分析的坐标集合，size = n*2
 #     :return:
 #     team: 组队情况,其中0值为没有组队成功的点，为孤立点
 #     noteam:没有组队的点所在的索引（元组）
 #     '''
-#     n = location.shape[0]
+#     n = locations.shape[0]
 #     team = np.zeros([n])
 #     i = 1
-#     D = compute_distance(location)
+#     D = compute_distance(locations)
 #     D[D == 0] = 1e5
 #     #当存在距离足够小（距离小于2的粒子对时才进行合并）
 #     while (D.min()<2):
 #         X, Y = np.where(D == D.min())
 #         for k in range(len(X)):
 #             x = X[k]
-#             y = Y[k]
-#             if team[x] == 0 and team[y] == 0:
-#                 team[x] = i;team[y] = i
+#             y1 = Y[k]
+#             if team[x] == 0 and team[y1] == 0:
+#                 team[x] = i;team[y1] = i
 #                 i = i+1
 #             elif team[x] == 0:
-#                 team[x] = team[y]
-#             elif team[y] == 0:
-#                 team[y] = team[x]
+#                 team[x] = team[y1]
+#             elif team[y1] == 0:
+#                 team[y1] = team[x]
 #             else:
-#                 team[team == team[x]] = team[y]
-#             D[x, y] = 1e5
+#                 team[team == team[x]] = team[y1]
+#             D[x, y1] = 1e5
 #         noteam = np.array([])
 #     if team.min() == 0:
 #         print('仍有没有组队的粒子点')
@@ -64,10 +64,10 @@ def compute_distance(location):
 #     '''
 #     pick_x, pick_y = np.where(P >= 250)
 #     n = pick_y.shape[0]
-#     location = np.zeros([n,2])
+#     locations = np.zeros([n,2])
 #     for i in range(n):
-#         location[i, :] = [pick_x[i], pick_y[i]]
-#     return location
+#         locations[i, :] = [pick_x[i], pick_y[i]]
+#     return locations
 
 # def TwovalueHiclustering(image, small_region = 3):
 #     '''
@@ -76,16 +76,16 @@ def compute_distance(location):
 #     :param small_region: 多小个像素算小区域？该数字以下的区域均被视为小区域
 #     :return: 去掉小区域之后的结果；team_dir聚类结果的字典（组成亮斑的所有像素集合分别属于第几组）
 #     '''
-#     location = picked(image)
-#     team, noteam = hiClustering(location)
+#     locations = picked(image)
+#     team, noteam = hiClustering(locations)
 #     if np.array(list(noteam)).size > 0:  # 如果有没组队的点
 #         discrete_point_image = image.copy()  # 用来展示孤立点的画布
-#         temp = location[noteam, :][0]  # 没组队点的坐标
+#         temp = locations[noteam, :][0]  # 没组队点的坐标
 #         n = temp.shape[0]  # 没组队点的个数
 #         for k in range(n):
 #             cv2.circle(discrete_point_image, temp[k, :].astype(np.int), 5, (225, 225, 0))#圈出没组队的点
 #         fun.draw(discrete_point_image, "the single point without team")
-#         temp = location[noteam]
+#         temp = locations[noteam]
 #         print('没组队的点坐标为：')
 #         print(temp)
 #         print('为了程序继续进行，默认把孤立白色粒子作为奇异点，并忽视处理（认为他们不再是白色粒子）')
@@ -102,7 +102,7 @@ def compute_distance(location):
 #             continue
 #         # 计算粒子半径的方法
 #         temp = np.array(list(np.where(team == i)))[0]  # temp为队伍为i的索引,一维索引
-#         loc = location[temp, :]  # loc为本类坐标
+#         loc = locations[temp, :]  # loc为本类坐标
 #         if len(temp) < small_region:
 #             for i in loc:
 #                 image[int(i[0]), int(i[1])] = 0

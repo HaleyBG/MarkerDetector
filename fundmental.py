@@ -4,7 +4,8 @@
 import numpy as np
 import cv2
 
-def hardvalsmall(w,t):
+
+def hardvalsmall(w, t):
     '''
     硬阈值函数, 抹平小值
     :param w: 小波平面矩阵(ndarray)
@@ -14,7 +15,8 @@ def hardvalsmall(w,t):
     w[w < t] = 0
     return w
 
-def hardval2(p,ld):
+
+def hardval2(p, ld):
     '''
     图像二值化，要求：矩阵元素大于零，若有负数，先求绝对值再进行二值化
     :param p: 相关系数矩阵(ndarray)
@@ -27,9 +29,12 @@ def hardval2(p,ld):
     P = temp.astype(np.uint8)
     return P
 
+
 def onmouse(event, x, y, flags, userdata):
     if event == 1:  # 点击鼠标左键时
         print("Row=", y, "Column=", x, "\n")  #
+
+
 def draw(p, named="No Name", time=0):
     '''
     作图函数
@@ -38,12 +43,14 @@ def draw(p, named="No Name", time=0):
     :param named: 图像窗口名字，str
     :return:
     '''
-    # cv2.namedWindow(named,cv2.WINDOW_NORMAL)
-    # cv2.setMouseCallback(named, onmouse,12)
-    # cv2.imshow(named, p)
-    # cv2.waitKey(time)
-    # cv2.destroyAllWindows()
+    cv2.namedWindow(named, cv2.WINDOW_NORMAL)
+    cv2.setMouseCallback(named, onmouse, 12)
+    cv2.imshow(named, p)
+    cv2.waitKey(time)
+    cv2.destroyAllWindows()
     return 0
+
+
 def ToOne(img):
     '''
     图像归一化函数
@@ -55,9 +62,14 @@ def ToOne(img):
     '''
     Max = img.max()
     Min = img.min()
-    image = (img - img.min())/(img.max()-img.min())
-    res = {'image': image, 'min': Min, 'max': Max, 'oldimage': img}
-    return res
+    mean, std = cv2.meanStdDev(img)
+    Max = Max if mean + 3 * std > Max else mean + 3 * std
+    Min = Min if mean - 3 * std < Min else mean - 3 * std
+    image = (img - img.min()) / (img.max() - img.min())
+    image[image > 1] == 1
+    image[image < 0] == 0
+    image = image.astype(np.float32)
+    return image
 
 
 def Img_in(img):
@@ -68,7 +80,7 @@ def Img_in(img):
     '''
     m = img.shape[0]
     n = img.shape[1]
-    temp = 255*np.ones((m, n))
+    temp = 255 * np.ones((m, n))
     Temp = temp - img
     return Temp
 
@@ -84,6 +96,8 @@ def Img_in2(img):
     temp = np.ones((m, n), dtype=np.float32)
     Temp = temp - img
     return Temp
+
+
 #
 # def removeNoise(image):
 #     '''
@@ -157,8 +171,9 @@ def drawPointr(a, dicRC, fontsize=False):
         r = int(dicRC[i]['r'] + 2)
         cv2.circle(a, [y, x], r, (10, 10, 255))
         if bool(fontsize):
-            cv2.putText(a, '(%s,%s)'%(y, x), [y, x], cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 1)
+            cv2.putText(a, '(%s,%s)' % (y, x), [y, x], cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 1)
     draw(a, 'the result of detection')
+
 
 def removeSmall(img, threshold):
     '''
@@ -203,12 +218,14 @@ def avgImg(image, k):
     :param k: 平均核边长（奇数）
     :return: 平滑之后的图像
     '''
-    kernel = np.ones([k, k])/(k*k)
+    kernel = np.ones([k, k]) / (k * k)
     filterImg = cv2.filter2D(image, -1, kernel)
     filterImgInfo = ToOne(filterImg)
     res = filterImgInfo['image']
     return res
-if __name__=='__main__':
+
+
+if __name__ == '__main__':
     image = cv2.imread('../data1cut_deres.jpg', 0)
     res = avgImg(image, 3)
     draw(res)

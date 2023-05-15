@@ -77,7 +77,7 @@ def distance(a, b):  # 计算欧式距离
     :type b: list
     """
     dis = 0
-    for i in range(0, len(a)):
+    for i in range(0, 2):
         dis += (a[i] - b[i]) ** 2
     return dis ** 0.5
 

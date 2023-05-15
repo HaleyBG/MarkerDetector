@@ -8,7 +8,7 @@ import math
 def gauss_A(loc):
     """
     计算高斯拟合中的系数矩阵
-    :param loc: 某一类的全体坐标集合[x,y,f]
+    :param loc: 某一类的全体坐标集合[x,y1,f]
     :return:gaussian拟合对应线性方程组的系数矩阵
     """
     A = np.array([
@@ -27,7 +27,7 @@ def gauss_A(loc):
 def gauss_b(info):
     """
     计算高斯拟合中的常数项矩阵
-    :param info: 某一类的全体坐标以及像素点集合[x,y,f]
+    :param info: 某一类的全体坐标以及像素点集合[x,y1,f]
     :return:gaussian拟合对应线性方程组的常数项
     """
     b = np.array([sum([(i[0] ** 2 + i[1] ** 2) * math.log(i[2]) for i in info]),
@@ -48,7 +48,7 @@ def compute_center_Gauss(picture:np.ndarray):
     """
     粒子圆心估计的高斯拟合方法(when b function is error, please check if the image get inverse)
     :param picture: 需要进行寻找中心的子图
-    :return:参数构成的字典，参数key值分别为：sigma, x, y, a
+    :return:参数构成的字典，参数key值分别为：sigma, x, y1, a
     """
     # 初始信息组合
     m, n = picture.shape
