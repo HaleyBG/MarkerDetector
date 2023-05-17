@@ -293,8 +293,8 @@ def markerauto_work_flow(img_ori: np.ndarray, template_ori: np.ndarray):
     # =======================
     # pre-processing
     # 归一化与取反操作
-    img = fun.Img_in2(img_ori)
-    img = bs.normalize(img)
+    img = bs.normalize(img_ori)
+    img = fun.Img_in2(img)
 
     template = bs.normalize(template_ori)
     template = fun.Img_in2(template)

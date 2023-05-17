@@ -106,7 +106,7 @@ def get_mrc_file_in_fixed_angle_and_save(file_path_name: str, angle: int = -1,
 
     else:
         projection = file_data[angle]
-        projection = cv2.normalize(projection, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+        # projection = cv2.normalize(projection, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
         if equalizeHist:
             projection = cv2.equalizeHist(projection)
         # cv2.imwrite(f"./projection/{file_name}_{angle}.jpg", projection)

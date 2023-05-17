@@ -18,6 +18,8 @@ import GaussFit as gs
 import os
 import matplotlib.pyplot as plt
 import mrc2jpg as mj
+import sys
+import mrcfile as mf
 import math
 
 
@@ -294,8 +296,8 @@ def markerauto_work_flow(img_ori: np.ndarray, template_ori: np.ndarray):
     # =======================
     # pre-processing
     # 归一化与取反操作
-    img = fun.Img_in2(img_ori)
-    img = bs.normalize(img)
+    img = bs.normalize(img_ori)
+    img = fun.Img_in2(img)
 
     template = bs.normalize(template_ori)
     template = fun.Img_in2(template)
@@ -452,7 +454,14 @@ if __name__ == '__main__':
     # input dataset
     root_dir = input("Mrc file path:")
     agle = eval(input("The index of the image you want to detect:"))
+    # root_dir = './mrc_file/10007_e2.mrc'
+    # agle = 61
     projection = mj.get_mrc_file_in_fixed_angle_and_save(root_dir, angle=agle)
+
+    mean = np.mean(projection)
+    std = np.std(projection)
+    projection = projection.copy()
+    projection[projection>mean+4*std] = mean + 4*std
     ori_img = cv2.normalize(projection, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
     file_name = root_dir.split('/')[-1]
     save_name = file_name.split('.')[0]+'.jpg'
@@ -460,10 +469,6 @@ if __name__ == '__main__':
     show_img = 0
     save_img = eval(input("Do you want to save the result images? \nIf yes, please input 1, otherwise input 0."))
     show_plt = 0
-
-    # 手动调节递归最大深度
-    import sys
-    sys.setrecursionlimit(3000)  # 设置最大递归深度为3000
 
     result_folder = f"./result_{time.strftime('%m-%d-%H-%M-%S', time.localtime(time.time()))}"
     bs.mkdir(result_folder)
@@ -531,7 +536,7 @@ if __name__ == '__main__':
     try:
         m, n = template1.shape
     except AttributeError:
-        print(f'Now we will passed it.')  # 说明模板生成阶段出现了问题
+        print(f'Now we will passed it.')  # This means tempalte generation was wrong.
         sys.exit(0)
     template1 = template_average(template1)
     ori_template = cv2.resize(template1, dsize=(int(mul_para * m), int(mul_para * n)),
@@ -565,13 +570,13 @@ if __name__ == '__main__':
     fid, score_error = location_fid(ori_img, ori_fid, temp_ori_m)
     end = time.time()
     print(f"The time of fiducial markers localization step is {end-start}")
-    information_file.write(f"The time of fiducial markers localization step is {end-start}")
-    ori_img = cv2.equalizeHist(ori_img)
+    information_file.write(f"The time of fiducial markers localization step is {end-start}\n")
+    # ori_img_draw = cv2.equalizeHist(ori_img)
     ori_img_draw = cv2.cvtColor(ori_img,cv2.COLOR_GRAY2BGR)
     for i in range(len(fid)):
         fids_file.write(f"{fid[i]}\n")
         cv2.circle(ori_img_draw, fid[i], int(radius_int*mul_para), (0, 0, 255))
+
     cv2.imwrite(f"./{result_folder}/end_{save_name}", ori_img_draw)
     fids_file.close()
-    information_file.write("===============================\n")
     information_file.close()
