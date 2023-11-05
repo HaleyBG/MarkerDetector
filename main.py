@@ -579,7 +579,7 @@ if __name__=="__main__":
     parser.add_argument("--dense", type=int, default=0, metavar="Mark whether the number of fiducial markers is dense enough (at least greater than 50)")
     parser.add_argument("--scale", type=int, default=2, metavar="The scale of wavelet transform")
     parser.add_argument("--threshold_ncc", type=float, default=0.55, metavar="The threshold of the Template Matching at the end of MarkerDetector")
-    parser.add_argument("--all_figure", type=int, default=0, metavar="Mark if save all figure")
+    parser.add_argument("--save_all_figure", type=int, default=0, metavar="Mark if save all figure")
     args = parser.parse_args()
     root_dir = args.mrc_dir
 
