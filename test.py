@@ -34,7 +34,7 @@ def template_make(img: np.ndarray, scale: int):
     threshold_pixel = 0.5
     threshold_shape = 0.75  # 0.85
     img_m, img_n = img.shape
-    threshold_remove = 4 if min(img_n, img_m) < 2000 else 8
+    threshold_remove = 4 if min(img_n, img_m) < 1500 else 8
     img = bs.normalize(img)
 
     wave_image, __ = wave.waveletprocess2(Image=img, J=j)
@@ -60,7 +60,7 @@ def template_make(img: np.ndarray, scale: int):
 
         # remove1: remove the sub_cubic by pixel，判断sub_img中点，均值mean，方差dev是否会合适
         if sub_img[center_int[i, 1] - stats[i, 1], center_int[i, 0] - stats[
-            i, 0]] > threshold_pixel or mean > threshold_pixel or dev < 0.1:
+            i, 0]] > threshold_pixel or mean > threshold_pixel or dev < 0.05:
             continue
 
         # remove2: remove the roundness too small,第一个判断是把十分不合理的从小波图去除，第二个判断更强，表示可以用作模板的patches的要求更高
@@ -114,6 +114,8 @@ def template_make(img: np.ndarray, scale: int):
         add_template = cv2.add(temp, add_template)
         num_template += 1
 
+    if num_template==0:
+        return 0,0,0
     template = add_template / num_template
     wavelet_image = img_2value
     return template, wavelet_image, d_end
@@ -282,6 +284,22 @@ def draw_point(img: np.ndarray, cubic_points: list, r: int, color: tuple = (255,
         fun.draw(img, "in draw_point function")
 
 
+def remove_by_ncc_in_end(fid):
+    """
+    filter by ncc in the end
+    """
+    global hyperparameter_ncc
+    new_fid = []
+    ncc_threshold = hyperparameter_ncc
+    index = 0
+    for i in range(len(fid)):
+        if fid[i][2]>=ncc_threshold:
+            temp = fid[i]
+            temp[5] = index
+            index += 1
+            new_fid.append(temp)
+    return new_fid
+
 def markerauto_work_flow(img_ori: np.ndarray, template_ori: np.ndarray):
     """
     markerauto
@@ -310,8 +328,8 @@ def markerauto_work_flow(img_ori: np.ndarray, template_ori: np.ndarray):
     img_mean, img_std_dev = cv2.meanStdDev(img)
     corr_mean, corr_std_dev = cv2.meanStdDev(corr)
 
-    img_threshold = img_mean
-    corr_threshold = corr_mean + 2 * corr_std_dev
+    img_threshold = int(img_mean.squeeze()*10)/10
+    corr_threshold = int((corr_mean.squeeze() + 2 * corr_std_dev.squeeze())*10)/10
 
     idiameter = int(2 * radius_int + 1)
 
@@ -332,7 +350,7 @@ def markerauto_work_flow(img_ori: np.ndarray, template_ori: np.ndarray):
                          wave_index])
                     wave_index += 1
                     cv2.circle(img_draw_temp, (peak_n + radius_int, peak_m + radius_int), radius_int,
-                               (0, 255, 0))
+                               (0, 255, 0), 2)
                 else:
                     candidate_no_wave.append(
                         [peak_n, peak_m, corr[peak_m, peak_n], get_ave_pixel(img, peak_n, peak_m, radius_int), 1,
@@ -340,7 +358,7 @@ def markerauto_work_flow(img_ori: np.ndarray, template_ori: np.ndarray):
                     # fids = [x, y1, corr, pixel, none, index]
                     no_index += 1
                     cv2.circle(img_draw_temp, (peak_n + radius_int, peak_m + radius_int), radius_int,
-                               (255, 0, 0))
+                               (0, 255, 0), 2)
             else:
                 remove_point.append([peak_n, peak_m])
 
@@ -381,6 +399,11 @@ def markerauto_work_flow(img_ori: np.ndarray, template_ori: np.ndarray):
     information_file.write(f"The number of fidicual markers in the third module is {len(new_fid)}\n")
     fid = new_fid
 
+
+    # ==========================
+    # step2 NCC filter in the end
+    new_fid = remove_by_ncc_in_end(fid=fid)
+    fid = new_fid
     # ========================
     # Remove repeated kd tree
     candidate_index_location = 5  # fid 的第几个分量为index
@@ -400,7 +423,7 @@ def markerauto_work_flow(img_ori: np.ndarray, template_ori: np.ndarray):
             if kd.distance(fid[i], L[j]) < dist_thr:
                 fid[int(L[j][candidate_index_location])][4] = -1
         new_fid.append(fid[i])
-        cv2.circle(img_draw_temp, [fid[i][0] + radius_int, fid[i][1] + radius_int], radius_int, (0, 0, 255))
+        cv2.circle(img_draw_temp, [fid[i][0] + radius_int, fid[i][1] + radius_int], radius_int, (0, 255, 0), 2)
         kd.clear_flag(node=node)
     fid = new_fid
     if show_img:
@@ -448,13 +471,12 @@ def location_fid(img: np.ndarray, location: np.ndarray, width: int):
 if __name__ == '__main__':
     global mrc_file, wave_img, radius_int, diameter_int, show_img, save_img, show_plt, fids_file, information_file
     show_img = 0
-    save_img = 1
+    save_img = 0
     show_plt = 0
+    hyperparameter_ncc = 0.55
 
     file_path_list = ['./mrccut/small/deep3/',
-                      './mrccut/big/deep3/',
-                      './mrccut/small/deep4/',
-                      './mrccut/big/deep4/']
+                      './mrccut/small/deep4/']
     switch = {'./mrccut/small/deep3/': (1, 2), './mrccut/big/deep3/': (0, 2), './mrccut/small/deep4/': (1, 3),
               './mrccut/big/deep4/': (0, 3)}  # dense, scale
 
@@ -569,7 +591,7 @@ if __name__ == '__main__':
             ori_img_draw = cv2.cvtColor(ori_img, cv2.COLOR_GRAY2BGR)
             for i in range(len(fid)):
                 fids_file.write(f"{fid[i]}\n")
-                cv2.circle(ori_img_draw, fid[i], int(radius_int * mul_para), (0, 0, 255))
+                cv2.circle(ori_img_draw, fid[i], int(radius_int * mul_para), (0, 255, 0), 2)
             cv2.imwrite(f"./{result_folder}/end_{mrc_file}", ori_img_draw)
             fids_file.close()
     information_file.close()

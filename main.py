@@ -307,8 +307,10 @@ def markerauto_work_flow(img_ori: np.ndarray, template_ori: np.ndarray):
     img_mean, img_std_dev = cv2.meanStdDev(img)
     corr_mean, corr_std_dev = cv2.meanStdDev(corr)
 
-    img_threshold = int(img_mean*10)/10
-    corr_threshold = int((corr_mean + 2 * corr_std_dev)*10)/10
+    img_threshold = int(img_mean.squeeze()*10)/10
+    # img_threshold = int(img_mean*10)/10
+    corr_threshold = int((corr_mean.squeeze() + 2 * corr_std_dev.squeeze())*10)/10
+    # corr_threshold = int((corr_mean + 2 * corr_std_dev)*10)/10
 
     idiameter = int(2 * radius_int + 1)
 

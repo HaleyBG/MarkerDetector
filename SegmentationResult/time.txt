@@ -1,6 +1,0 @@
-The wavelet segmentation will be executed. 
-================================
-The input image is 70001.
-The number of labels is 1031.
-the time of 70001 is 0:00:02.689424
-wavelet process is over
