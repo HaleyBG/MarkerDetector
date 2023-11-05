@@ -9,5 +9,6 @@ detecting fiducial markers in cryo-electron tomography
 ## Usage
 Prepare the dataset in MRC format, and run the entry program "main.py".
 
-    python3 main.py
+    python3 main.py <mrc_file_path> <Index of projection> [--dense 0] [--scale 2] [--threshold_ncc 0.55] [--save_all_figure 0]
+    
 The program will prompt you to enter the required information.
