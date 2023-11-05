@@ -1,3 +1,11 @@
+'''
+Author: Hou Gaoxin 710872687@qq.com
+Date: 2023-05-13 14:34:16
+LastEditors: Hou Gaoxin 710872687@qq.com
+LastEditTime: 2023-10-01 22:50:28
+FilePath: /Program_detection_program/watershed_py.py
+Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+'''
 import cv2
 import numpy as np
 import fundmental as fun
@@ -67,6 +75,6 @@ def watershed_py(oriImg, thresh, f=None):
     num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(copy_img, connectivity=8, ltype=None)
     if f:
         f.write(f'The number of labels is {num_labels}.\n')
-    oriImg[markers == -1] = (0, 0, 255)
+    oriImg[markers == -1] = (0, 255, 0)
     # fun.draw(oriImg)
     return oriImg

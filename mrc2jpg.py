@@ -11,6 +11,7 @@ import os
 import mrcfile as mf
 import cv2
 import numpy as np
+import fundmental as fun
 
 
 def get_filename_with_mrc_end(file_dir: str):
@@ -54,13 +55,16 @@ def get_mrc_file_in_fixed_angle_and_save(file_path_name: str, angle: int = -1,
     """
 
     :param file_path_name:
-    :param interval: 间隔的角度
-    :param angle: 是否输入确定的角度
-    :param equalizeHist: 是否图像均衡化
+    :param interval: interval of angles
+    :param angle: if fixed angles?
+    :param equalizeHist: if equalized?
     :return:
     """
     file = mf.open(file_path_name)
     file_data = file.data
+    file_max = np.max(file_data)
+    file_min = np.min(file_data)
+    file_data = (((file_data - file_min)/file_max)*255).astype(np.uint8)
     temp = file_path_name.split('/')[-1]
     file_name = temp.split('.')[0]
     # set the fixed angle
@@ -76,7 +80,7 @@ def get_mrc_file_in_fixed_angle_and_save(file_path_name: str, angle: int = -1,
         i = mid
         while i < total_number:
             projection = file_data[i]
-            projection = cv2.normalize(projection, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+            # projection = cv2.normalize(projection, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
             if equalizeHist:
                 projection = cv2.equalizeHist(projection)
             # cv2.imwrite(f"./projection/{file_name}_{i}.jpg", projection)
@@ -106,25 +110,33 @@ def get_mrc_file_in_fixed_angle_and_save(file_path_name: str, angle: int = -1,
 
     else:
         projection = file_data[angle]
-        # projection = cv2.normalize(projection, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+        pro_mean = np.mean(projection)
+        pro_std = np.std(projection)
+        projection = projection.copy()
+        projection[projection>pro_mean+4*pro_std] = pro_mean + 4*pro_std
+        projection[projection<pro_mean-4*pro_std] = pro_mean - 4*pro_std
+        projection = cv2.normalize(projection, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
         if equalizeHist:
             projection = cv2.equalizeHist(projection)
-        # cv2.imwrite(f"./projection/{file_name}_{angle}.jpg", projection)
+        # fun.draw(projection)
+        cv2.imwrite(f"./projection/{file_name}_{angle}.jpg", projection)
         return projection
 
 
 if __name__ == "__main__":
-    # get all mrc mrc_file with *_e2.mrc
-    # root_dir = r"/dataset/ETdata"
-    # mrc_list = read_all_file_in_filepath(f"{root_dir}")
-    #
-    #
-    # for mrc_file in mrc_list:
-    #     get_mrc_file_in_fixed_angle_and_save(mrc_file, interval=5, equalizeHist=True)
 
-    # Usually
-    root_dir = input("Mrc file path:")
-    agle = eval(input("The index of the image you want to extract:"))
+    root_dir_list = [
+        '/media/haley/Expansion/ETdata/70001/70001.st',
+    ]
+    agle_list = [
+    55,
+        ]
+
     if not os.path.exists('./projection'):
         os.mkdir('./projection')
-    get_mrc_file_in_fixed_angle_and_save(root_dir, angle=agle)
+    for i in range(len(agle_list)):
+        root_dir = root_dir_list[i]
+        agle = agle_list[i]
+        print(f"=============================")
+        print(f"{root_dir}")
+        get_mrc_file_in_fixed_angle_and_save(root_dir, angle=agle)

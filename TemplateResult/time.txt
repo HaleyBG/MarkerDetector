@@ -1,0 +1,7 @@
+=========================================
+The program file is main_templatematch.py.
+start the process of template matching
+=================================The input image is 70001.st.
+The total number of particle is 389
+the time of 70001.st is 0:00:01.476132
+end the process of template matching 
