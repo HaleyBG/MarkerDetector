@@ -576,32 +576,42 @@ def main(root_dir, projection, agle, dense, scale, result_folder):
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description="Information Input")
-    parser.add_argument("mrc_dir", type=str, metavar="MRC file path")
-    parser.add_argument("fixed_projection", type=int, metavar="Index of projection to detect" )
-    parser.add_argument("--dense", type=int, default=0, metavar="Mark whether the number of fiducial markers is dense enough (at least greater than 50)")
-    parser.add_argument("--scale", type=int, default=2, metavar="The scale of wavelet transform")
-    parser.add_argument("--threshold_ncc", type=float, default=0.55, metavar="The threshold of the Template Matching at the end of MarkerDetector")
-    parser.add_argument("--save_all_figure", type=int, default=0, metavar="Mark if save all figure")
+    # parser.add_argument("mrc_dir", type=str, metavar="MRC file path")
+    # parser.add_argument("fixed_projection", type=int, metavar="Index of projection to detect" )
+    # parser.add_argument("--dense", type=int, default=0, metavar="Mark whether the number of fiducial markers is dense enough (at least greater than 50)")
+    # parser.add_argument("--scale", type=int, default=2, metavar="The scale of wavelet transform")
+    # parser.add_argument("--threshold_ncc", type=float, default=0.55, metavar="The threshold of the Template Matching at the end of MarkerDetector")
+    # parser.add_argument("--save_all_figure", type=int, default=0, metavar="Mark if save all figure")
+    
+    parser.add_argument("mrc_dir", type=str, metavar="MRC_DIR")
+    parser.add_argument("p_idx", type=int, metavar="PROJECTION_idx" )
+    parser.add_argument("-d", type=bool, default=False, metavar="DENSE_FEATURE")
+    parser.add_argument("-s", type=int, default=2, metavar="WAVELET_SCALE")
+    parser.add_argument("-t", type=float, default=0.55, metavar="NCC_THRESHOLD")
+    parser.add_argument("-sf", type=bool, default=False, metavar="SAVE_FIG")
     args = parser.parse_args()
     root_dir = args.mrc_dir
 
-    save_img = args.all_figure
+    save_img = args.sf
 
-    if args.fixed_projection == -1:
+    if args.p_idx == -1:
         detect_one_projection = 0
     else:
         detect_one_projection = 1
-        detect_which_projection = args.fixed_projection
-    dense = args.dense
-    scale = args.scale
-    hyperparameter_ncc = args.threshold_ncc
-
-    file_data = mf.open(root_dir).data
+        detect_which_projection = args.p_idx
+    dense = args.d
+    scale = args.s
+    hyperparameter_ncc = args.t
+    mrc_file = mf.open(root_dir)
+    file_data = mrc_file.data
+    mrc_file.close()
     num_projection = file_data.shape[0]
 for angle in range(num_projection):
     if detect_one_projection:
         if angle != detect_which_projection:
             continue
+    print("----------")
+    print(f"Detection: {angle}th")
     projection = file_data[angle].copy()
     result_folder_root = f"./Result"
     if not os.path.exists(result_folder_root):

@@ -475,10 +475,10 @@ if __name__ == '__main__':
     show_plt = 0
     hyperparameter_ncc = 0.55
 
-    file_path_list = ['./mrccut/small/deep3/',
-                      './mrccut/small/deep4/']
-    switch = {'./mrccut/small/deep3/': (1, 2), './mrccut/big/deep3/': (0, 2), './mrccut/small/deep4/': (1, 3),
-              './mrccut/big/deep4/': (0, 3)}  # dense, scale
+    file_path_list = ['./mrccut/dense1/scale2/',
+                      './mrccut/dense1/scale3/']
+    switch = {'./mrccut/dense1/scale2/': (1, 2), './mrccut/dense0/scale2/': (0, 2), './mrccut/dense1/scale3/': (1, 3),
+              './mrccut/dense0/scale3/': (0, 3)}  # dense, scale
 
     # 手动调节递归最大深度
     import sys

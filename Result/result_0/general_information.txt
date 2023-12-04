@@ -1,0 +1,28 @@
+Time：2023-12-04 10:16:00
+The program file is main.py.
+The input mrc_file is 20160914_YWC216_10016.st ... 
+The selected angle is 0.
+The scale=2; dense=False
+The shape of the projection is (3710, 3838).
+The time of the first module is 0.4488048553466797.
+The time of the second module is 1.247741937637329.
+The number of fiducial markers in the second module is 6288
+The time of the third module is 0.0022559165954589844
+The number of fidicual markers in the third module is 442
+The number of detected fiducial markers in detection step is 291.
+The time of detection step is 1.9009404182434082
+The time of fiducial markers localization step is 2.876978635787964
+Time：2023-12-04 10:17:17
+The program file is main.py.
+The input mrc_file is 20160914_YWC216_10016.st ... 
+The selected angle is 0.
+The scale=2; dense=False
+The shape of the projection is (3710, 3838).
+The time of the first module is 0.395432710647583.
+The time of the second module is 1.2375497817993164.
+The number of fiducial markers in the second module is 6288
+The time of the third module is 0.002192258834838867
+The number of fidicual markers in the third module is 442
+The number of detected fiducial markers in detection step is 291.
+The time of detection step is 1.8054687976837158
+The time of fiducial markers localization step is 2.8766188621520996
