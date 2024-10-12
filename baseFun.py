@@ -50,8 +50,12 @@ def img_hist(img: np.ndarray):
     plt.show()
 
 
-def readname(filePath='/home/lthpc/Documents/Programs/WaveletDetectionChange/mrccut_old/small/'):
-    name = os.listdir(filePath)
+# def readname(filePath='/home/lthpc/Documents/Programs/WaveletDetectionChange/mrccut_old/small/'):
+def readname(filePath=None):
+    if filePath is not None:
+        name = os.listdir(filePath)
+    else:
+        name = None
     return name
 
 
